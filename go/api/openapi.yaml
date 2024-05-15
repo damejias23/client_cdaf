@@ -1,0 +1,561 @@
+openapi: 3.0.0
+info:
+  description: "CDAF Event Exposure Service.  \n© 2023, 3GPP Organizational Partners\
+    \ (ARIB, ATIS, CCSA, ETSI, TSDSI, TTA, TTC).  \nAll rights reserved.\n"
+  title: Ncdaf_EventExposure
+  version: 1.2.3
+externalDocs:
+  description: 3GPP TS 29.518 V17.10.0; 5G System; Access and Mobility Management
+    Services
+  url: https://www.3gpp.org/ftp/Specs/archive/29_series/29.518/
+servers:
+- url: "{apiRoot}/ncdaf-evts/v1"
+  variables:
+    apiRoot:
+      default: https://example.com
+      description: apiRoot as defined in clause 4.4 of 3GPP TS 29.501
+security:
+- {}
+- oAuth2ClientCredentials:
+  - ncdaf-evts
+paths:
+  /subscriptions:
+    post:
+      callbacks:
+        onEventReport:
+          '{$request.body#/subscription/eventNotifyUri}':
+            post:
+              operationId: onEventReport_Post
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CdafEventNotification'
+                required: true
+              responses:
+                "204":
+                  description: Successful acknowledgement
+                default:
+                  description: Unexpected error
+              summary: Event Notificaiton Delivery
+              x-callback-request: true
+        onSubscriptionIdChangeEvtReport:
+          '{$request.body#/subscription/subsChangeNotifyUri}':
+            post:
+              operationId: onSubscriptionIdChangeEvtReport_Post
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CdafEventNotification'
+                required: true
+              responses:
+                "204":
+                  description: Successful acknowledgement
+                default:
+                  description: Unexpected error
+              summary: Event Notificaiton Delivery For Subscription Id Change
+              x-callback-request: true
+      operationId: CreateSubscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CdafCreateEventSubscription'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CdafCreatedEventSubscription'
+          description: Subsription Created
+          headers:
+            Location:
+              description: "Contains the URI of the newly created resource, according\
+                \ to the structure: {apiRoot}/ncdaf-evts/<apiVersion>/subscriptions/{subscriptionId}"
+              explode: false
+              required: true
+              schema:
+                type: string
+              style: simple
+        default:
+          description: Unexpected error
+      summary: Ncdaf_EventExposure Subscribe service Operation
+      tags:
+      - Subscriptions collection (Collection)
+  /subscriptions/{subscriptionId}:
+    delete:
+      operationId: DeleteSubscription
+      parameters:
+      - description: Unique ID of the subscription to be deleted
+        explode: false
+        in: path
+        name: subscriptionId
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Subsription deleted successfully
+        default:
+          description: Unexpected error
+      summary: Ncdaf_EventExposure Unsubscribe service Operation
+      tags:
+      - Individual subscription (Document)
+components:
+  schemas:
+    CdafEventSubscription:
+      description: Represents an individual event subscription resource on CDAF
+      example:
+        eventNotifyUri: eventNotifyUri
+        eventRequest:
+          maxResponseTime: 6
+          minInterval: 1
+          nextReport: 2000-01-23T04:56:07.000+00:00
+          nextPeriodicReportTime: 2000-01-23T04:56:07.000+00:00
+          type: null
+          maxReports: 0
+        options:
+          trigger: null
+          expiry: 2000-01-23T04:56:07.000+00:00
+          maxReports: 5
+          repPeriod: 5
+          sampRatio: 23
+      properties:
+        eventRequest:
+          $ref: '#/components/schemas/CdafEvent'
+        eventNotifyUri:
+          description: String providing an URI formatted according to RFC 3986.
+          type: string
+        options:
+          $ref: '#/components/schemas/CdafEventMode'
+      required:
+      - eventNotifyUri
+      - eventRequest
+      type: object
+    CdafEvent:
+      description: Describes an event to be subscribed
+      example:
+        maxResponseTime: 6
+        minInterval: 1
+        nextReport: 2000-01-23T04:56:07.000+00:00
+        nextPeriodicReportTime: 2000-01-23T04:56:07.000+00:00
+        type: null
+        maxReports: 0
+      properties:
+        type:
+          $ref: '#/components/schemas/CdafEventType'
+        maxReports:
+          type: integer
+        maxResponseTime:
+          description: indicating a time in seconds.
+          type: integer
+        minInterval:
+          description: indicating a time in seconds.
+          type: integer
+        nextReport:
+          description: string with format 'date-time' as defined in OpenAPI.
+          format: date-time
+          type: string
+        nextPeriodicReportTime:
+          description: string with format 'date-time' as defined in OpenAPI.
+          format: date-time
+          type: string
+      required:
+      - type
+      type: object
+    CdafEventNotification:
+      description: Data within a CADF Event Notification request
+      example:
+        eventSubsSyncInfo:
+          subscriptionInfo:
+            subId: subId
+            oldSubId: oldSubId
+        reportEvent:
+          timeStamp: 2000-01-23T04:56:07.000+00:00
+          nfLoadLevelInfos:
+          - nfInstanceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            nfStorageUsage: 4
+            nfCpuUsage: 3
+            nfType: null
+            nfSetId: nfSetId
+            nfMemoryUsage: 2
+          - nfInstanceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            nfStorageUsage: 4
+            nfCpuUsage: 3
+            nfType: null
+            nfSetId: nfSetId
+            nfMemoryUsage: 2
+          state:
+            remainDuration: 9
+            active: true
+            remainReports: 7
+          type: null
+          subscriptionId: subscriptionId
+      properties:
+        reportEvent:
+          $ref: '#/components/schemas/CdafEventReport'
+        eventSubsSyncInfo:
+          $ref: '#/components/schemas/CdafEventSubsSyncInfo'
+      type: object
+    CdafEventReport:
+      description: Represents a report triggered by a subscribed event type
+      example:
+        timeStamp: 2000-01-23T04:56:07.000+00:00
+        nfLoadLevelInfos:
+        - nfInstanceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          nfStorageUsage: 4
+          nfCpuUsage: 3
+          nfType: null
+          nfSetId: nfSetId
+          nfMemoryUsage: 2
+        - nfInstanceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+          nfStorageUsage: 4
+          nfCpuUsage: 3
+          nfType: null
+          nfSetId: nfSetId
+          nfMemoryUsage: 2
+        state:
+          remainDuration: 9
+          active: true
+          remainReports: 7
+        type: null
+        subscriptionId: subscriptionId
+      properties:
+        type:
+          $ref: '#/components/schemas/CdafEventType'
+        state:
+          $ref: '#/components/schemas/CdafEventState'
+        timeStamp:
+          description: string with format 'date-time' as defined in OpenAPI.
+          format: date-time
+          type: string
+        subscriptionId:
+          description: String providing an URI formatted according to RFC 3986.
+          type: string
+        nfLoadLevelInfos:
+          items:
+            $ref: '#/components/schemas/NfLoadLevelInformation'
+          minItems: 1
+          type: array
+      required:
+      - state
+      - timeStamp
+      - type
+      type: object
+    CdafEventMode:
+      description: Describes how the reports shall be generated by a subscribed event
+      example:
+        trigger: null
+        expiry: 2000-01-23T04:56:07.000+00:00
+        maxReports: 5
+        repPeriod: 5
+        sampRatio: 23
+      properties:
+        trigger:
+          $ref: '#/components/schemas/CdafEventTrigger'
+        maxReports:
+          type: integer
+        expiry:
+          description: string with format 'date-time' as defined in OpenAPI.
+          format: date-time
+          type: string
+        repPeriod:
+          description: indicating a time in seconds.
+          type: integer
+        sampRatio:
+          description: "Unsigned integer indicating Sampling Ratio (see clauses 4.15.1\
+            \ of 3GPP TS 23.502), expressed in percent. \n"
+          maximum: 100
+          minimum: 1
+          type: integer
+      required:
+      - trigger
+      type: object
+    CdafEventState:
+      description: Represents the state of a subscribed event
+      example:
+        remainDuration: 9
+        active: true
+        remainReports: 7
+      properties:
+        active:
+          type: boolean
+        remainReports:
+          type: integer
+        remainDuration:
+          description: indicating a time in seconds.
+          type: integer
+      required:
+      - active
+      type: object
+    CdafCreateEventSubscription:
+      description: Data within a create CDAF event subscription request
+      example:
+        subscription:
+          eventNotifyUri: eventNotifyUri
+          eventRequest:
+            maxResponseTime: 6
+            minInterval: 1
+            nextReport: 2000-01-23T04:56:07.000+00:00
+            nextPeriodicReportTime: 2000-01-23T04:56:07.000+00:00
+            type: null
+            maxReports: 0
+          options:
+            trigger: null
+            expiry: 2000-01-23T04:56:07.000+00:00
+            maxReports: 5
+            repPeriod: 5
+            sampRatio: 23
+      properties:
+        subscription:
+          $ref: '#/components/schemas/CdafEventSubscription'
+      required:
+      - subscription
+      type: object
+    CdafCreatedEventSubscription:
+      description: Data within a create CDAF event subscription response
+      example:
+        reportEvent:
+          timeStamp: 2000-01-23T04:56:07.000+00:00
+          nfLoadLevelInfos:
+          - nfInstanceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            nfStorageUsage: 4
+            nfCpuUsage: 3
+            nfType: null
+            nfSetId: nfSetId
+            nfMemoryUsage: 2
+          - nfInstanceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+            nfStorageUsage: 4
+            nfCpuUsage: 3
+            nfType: null
+            nfSetId: nfSetId
+            nfMemoryUsage: 2
+          state:
+            remainDuration: 9
+            active: true
+            remainReports: 7
+          type: null
+          subscriptionId: subscriptionId
+        subscription:
+          eventNotifyUri: eventNotifyUri
+          eventRequest:
+            maxResponseTime: 6
+            minInterval: 1
+            nextReport: 2000-01-23T04:56:07.000+00:00
+            nextPeriodicReportTime: 2000-01-23T04:56:07.000+00:00
+            type: null
+            maxReports: 0
+          options:
+            trigger: null
+            expiry: 2000-01-23T04:56:07.000+00:00
+            maxReports: 5
+            repPeriod: 5
+            sampRatio: 23
+        subscriptionId: subscriptionId
+      properties:
+        subscription:
+          $ref: '#/components/schemas/CdafEventSubscription'
+        subscriptionId:
+          description: String providing an URI formatted according to RFC 3986.
+          type: string
+        reportEvent:
+          $ref: '#/components/schemas/CdafEventReport'
+      required:
+      - subscription
+      - subscriptionId
+      type: object
+    CdafEventSubsSyncInfo:
+      description: CDAF Event Subscriptions Information for synchronization
+      example:
+        subscriptionInfo:
+          subId: subId
+          oldSubId: oldSubId
+      properties:
+        subscriptionInfo:
+          $ref: '#/components/schemas/CdafEventSubscriptionInfo'
+      required:
+      - subscriptionInfo
+      type: object
+    CdafEventSubscriptionInfo:
+      description: Individual CDAF Event Subscription Information
+      example:
+        subId: subId
+        oldSubId: oldSubId
+      properties:
+        subId:
+          description: String providing an URI formatted according to RFC 3986.
+          type: string
+        oldSubId:
+          description: String providing an URI formatted according to RFC 3986.
+          type: string
+      required:
+      - subId
+      type: object
+    NfLoadLevelInformation:
+      allOf:
+      - required:
+        - nfType
+      - required:
+        - nfInstanceId
+      - anyOf:
+        - required:
+          - nfCpuUsage
+        - required:
+          - nfMemoryUsage
+        - required:
+          - nfStorageUsage
+      description: Represents load level information of a given NF instance.
+      example:
+        nfInstanceId: 046b6c7f-0b8a-43b9-b35d-6489e6daee91
+        nfStorageUsage: 4
+        nfCpuUsage: 3
+        nfType: null
+        nfSetId: nfSetId
+        nfMemoryUsage: 2
+      properties:
+        nfType:
+          $ref: '#/components/schemas/NFType'
+        nfInstanceId:
+          description: "String uniquely identifying a NF instance. The format of the\
+            \ NF Instance ID shall be a  Universally Unique Identifier (UUID) version\
+            \ 4, as described in IETF RFC 4122. \n"
+          format: uuid
+          type: string
+        nfSetId:
+          description: "NF Set Identifier (see clause 28.12 of 3GPP TS 23.003), formatted\
+            \ as the following string \"set<Set ID>.<nftype>set.5gc.mnc<MNC>.mcc<MCC>\"\
+            , or  \"set<SetID>.<NFType>set.5gc.nid<NID>.mnc<MNC>.mcc<MCC>\" with \
+            \ <MCC> encoded as defined in clause 5.4.2 (\"Mcc\" data type definition)\
+            \  <MNC> encoding the Mobile Network Code part of the PLMN, comprising\
+            \ 3 digits. \n  If there are only 2 significant digits in the MNC, one\
+            \ \"0\" digit shall be inserted \n  at the left side to fill the 3 digits\
+            \ coding of MNC.  Pattern: '^[0-9]{3}$'\n<NFType> encoded as a value defined\
+            \ in Table 6.1.6.3.3-1 of 3GPP TS 29.510 but \n  with lower case characters\
+            \ <Set ID> encoded as a string of characters consisting of \n  alphabetic\
+            \ characters (A-Z and a-z), digits (0-9) and/or the hyphen (-) and that\
+            \ \n  shall end with either an alphabetic character or a digit. \n"
+          type: string
+        nfCpuUsage:
+          type: integer
+        nfMemoryUsage:
+          type: integer
+        nfStorageUsage:
+          type: integer
+      type: object
+    CdafEventType:
+      anyOf:
+      - $ref: '#/components/schemas/CdafEventType_anyOf'
+      - type: string
+      description: Describes the supported event types of Ncadf_EventExposure Service
+    CdafEventTrigger:
+      anyOf:
+      - $ref: '#/components/schemas/CdafEventTrigger_anyOf'
+      - type: string
+      description: Describes how CDAF should generate the report for the event
+    NFType:
+      anyOf:
+      - $ref: '#/components/schemas/NFType_anyOf'
+      - type: string
+      description: NF types known to NRF
+    NfInstanceId:
+      description: "String uniquely identifying a NF instance. The format of the NF\
+        \ Instance ID shall be a  Universally Unique Identifier (UUID) version 4,\
+        \ as described in IETF RFC 4122. \n"
+      format: uuid
+      type: string
+    NfSetId:
+      description: "NF Set Identifier (see clause 28.12 of 3GPP TS 23.003), formatted\
+        \ as the following string \"set<Set ID>.<nftype>set.5gc.mnc<MNC>.mcc<MCC>\"\
+        , or  \"set<SetID>.<NFType>set.5gc.nid<NID>.mnc<MNC>.mcc<MCC>\" with  <MCC>\
+        \ encoded as defined in clause 5.4.2 (\"Mcc\" data type definition)  <MNC>\
+        \ encoding the Mobile Network Code part of the PLMN, comprising 3 digits.\
+        \ \n  If there are only 2 significant digits in the MNC, one \"0\" digit shall\
+        \ be inserted \n  at the left side to fill the 3 digits coding of MNC.  Pattern:\
+        \ '^[0-9]{3}$'\n<NFType> encoded as a value defined in Table 6.1.6.3.3-1 of\
+        \ 3GPP TS 29.510 but \n  with lower case characters <Set ID> encoded as a\
+        \ string of characters consisting of \n  alphabetic characters (A-Z and a-z),\
+        \ digits (0-9) and/or the hyphen (-) and that \n  shall end with either an\
+        \ alphabetic character or a digit. \n"
+      type: string
+    CdafEventType_anyOf:
+      enum:
+      - REPORT_RESOURCE_USAGE
+      type: string
+    CdafEventTrigger_anyOf:
+      enum:
+      - ONE_TIME
+      - CONTINUOUS
+      - PERIODIC
+      type: string
+    NFType_anyOf:
+      enum:
+      - NRF
+      - UDM
+      - AMF
+      - SMF
+      - AUSF
+      - NEF
+      - PCF
+      - SMSF
+      - NSSF
+      - UDR
+      - LMF
+      - GMLC
+      - 5G_EIR
+      - SEPP
+      - UPF
+      - N3IWF
+      - AF
+      - UDSF
+      - BSF
+      - CHF
+      - NWDAF
+      - PCSCF
+      - CBCF
+      - HSS
+      - UCMF
+      - SOR_AF
+      - SPAF
+      - MME
+      - SCSAS
+      - SCEF
+      - SCP
+      - NSSAAF
+      - ICSCF
+      - SCSCF
+      - DRA
+      - IMS_AS
+      - AANF
+      - 5G_DDNMF
+      - NSACF
+      - MFAF
+      - EASDF
+      - DCCF
+      - MB_SMF
+      - TSCTSF
+      - ADRF
+      - GBA_BSF
+      - CEF
+      - MB_UPF
+      - NSWOF
+      - PKMF
+      - MNPF
+      - SMS_GMSC
+      - SMS_IWMSC
+      - MBSF
+      - MBSTF
+      - PANF
+      - IP_SM_GW
+      - SMS_ROUTER
+      type: string
+  securitySchemes:
+    oAuth2ClientCredentials:
+      flows:
+        clientCredentials:
+          scopes:
+            ncdaf-evts: Access to the Ncdaf_EventExposure API
+          tokenUrl: "{nrfApiRoot}/oauth2/token"
+      type: oauth2
