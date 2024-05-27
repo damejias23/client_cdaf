@@ -13,8 +13,12 @@ package openapi
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
+	"os"
+	"crypto/tls"
+	"golang.org/x/net/http2"
 )
 
 // contextKeys are used to identify the type of value in the context.
@@ -102,24 +106,39 @@ func NewConfiguration() *Configuration {
 	cfg := &Configuration{
 		DefaultHeader:    make(map[string]string),
 		UserAgent:        "OpenAPI-Generator/1.0.0/go",
-		Debug:            false,
+		Debug:            true, // set to true, default: false
 		Servers:          ServerConfigurations{
 			{
-				URL: "{apiRoot}/ncdaf-evts/v1",
-				Description: "No description provided",
+				URL: os.Getenv("CDAF_IP_ADDR") + os.Getenv("CDAF_SUBSCR_ROUTE"),
+				Description: "CDAF IP address",
 				Variables: map[string]ServerVariable{
 					"apiRoot": ServerVariable{
-						Description: "apiRoot as defined in clause 4.4 of 3GPP TS 29.501",
+						Description: "apiRoot as defined in clause clause 4.4 of 3GPP TS 29.501",
 						DefaultValue: "https://example.com",
 					},
 				},
 			},
 		},
-		OperationServers: map[string]ServerConfigurations{
-		},
+		OperationServers: map[string]ServerConfigurations{},
+	}
+	// Check if AMF_HTTP_VERSION is set to "2"
+	if os.Getenv("CDAF_HTTP_VERSION") == "2" {
+		// Set HTTPClient configuration for AMF HTTP version 2
+		cfg.HTTPClient = &http.Client{
+			Transport: &http2.Transport{
+				AllowHTTP: true,
+				DialTLS: func(netw, addr string, cfg *tls.Config) (net.Conn, error) {
+					return net.Dial(netw, addr)
+				},
+			},
+		}
+	} else {
+		// Set default HTTPClient configuration for other cases
+		cfg.HTTPClient = &http.Client{}
 	}
 	return cfg
 }
+
 
 // AddDefaultHeader adds a new HTTP header to the default header in the request
 func (c *Configuration) AddDefaultHeader(key string, value string) {
