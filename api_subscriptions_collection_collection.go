@@ -16,7 +16,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"log"
 )
 
 
@@ -98,12 +97,12 @@ func (a *SubscriptionsCollectionCollectionApiService) CreateSubscriptionExecute(
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
-	log.Printf("1\n")
+
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
-	log.Printf("\n")
+
 	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
