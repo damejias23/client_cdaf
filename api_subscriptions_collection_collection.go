@@ -60,12 +60,12 @@ func (a *SubscriptionsCollectionCollectionApiService) CreateSubscriptionExecute(
 		formFiles            []formFile
 		localVarReturnValue  *CdafCreatedEventSubscription
 	)
-	log.Printf("1\n")
+
 	localBasePath, err := a.client.cfg.ServerURLWithContext(r.ctx, "SubscriptionsCollectionCollectionApiService.CreateSubscription")
 	if err != nil {
 		return localVarReturnValue, nil, &GenericOpenAPIError{error: err.Error()}
 	}
-	log.Printf("2\n")
+
 	localVarPath := localBasePath + "/subscriptions"
 
 	localVarHeaderParams := make(map[string]string)
@@ -74,7 +74,7 @@ func (a *SubscriptionsCollectionCollectionApiService) CreateSubscriptionExecute(
 	if r.cdafCreateEventSubscription == nil {
 		return localVarReturnValue, nil, reportError("cdafCreateEventSubscription is required and must be specified")
 	}
-	log.Printf("3\n")
+
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"application/json"}
 
@@ -83,7 +83,7 @@ func (a *SubscriptionsCollectionCollectionApiService) CreateSubscriptionExecute(
 	if localVarHTTPContentType != "" {
 		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
 	}
-	log.Printf("4\n")
+
 	// to determine the Accept header
 	localVarHTTPHeaderAccepts := []string{"application/json"}
 
@@ -92,26 +92,25 @@ func (a *SubscriptionsCollectionCollectionApiService) CreateSubscriptionExecute(
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	log.Printf("5\n")
 	// body params
 	localVarPostBody = r.cdafCreateEventSubscription
 	req, err := a.client.prepareRequest(r.ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, formFiles)
 	if err != nil {
 		return localVarReturnValue, nil, err
 	}
-	log.Printf("6\n")
+	log.Printf("1\n")
 	localVarHTTPResponse, err := a.client.callAPI(req)
 	if err != nil || localVarHTTPResponse == nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
-	log.Printf("7\n")
+	log.Printf("\n")
 	localVarBody, err := ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	localVarHTTPResponse.Body = ioutil.NopCloser(bytes.NewBuffer(localVarBody))
 	if err != nil {
 		return localVarReturnValue, localVarHTTPResponse, err
 	}
-	log.Printf("8\n")
+
 	if localVarHTTPResponse.StatusCode >= 300 {
 		newErr := &GenericOpenAPIError{
 			body:  localVarBody,
@@ -119,7 +118,7 @@ func (a *SubscriptionsCollectionCollectionApiService) CreateSubscriptionExecute(
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
-	log.Printf("9\n")
+
 	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 	if err != nil {
 		newErr := &GenericOpenAPIError{
@@ -128,6 +127,6 @@ func (a *SubscriptionsCollectionCollectionApiService) CreateSubscriptionExecute(
 		}
 		return localVarReturnValue, localVarHTTPResponse, newErr
 	}
-	log.Printf("10\n")
+
 	return localVarReturnValue, localVarHTTPResponse, nil
 }

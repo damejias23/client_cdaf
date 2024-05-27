@@ -163,6 +163,7 @@ func parameterToJson(obj interface{}) (string, error) {
 
 // callAPI do the request.
 func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
+	log.Printf("\n10\n")
 	if c.cfg.Debug {
 		dump, err := httputil.DumpRequestOut(request, true)
 		if err != nil {
@@ -170,11 +171,12 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		}
 		log.Printf("\n%s\n", string(dump))
 	}
-
+	log.Printf("\n11\n")
 	resp, err := c.cfg.HTTPClient.Do(request)
 	if err != nil {
 		return resp, err
 	}
+	log.Printf("\n12\n")
 
 	if c.cfg.Debug {
 		dump, err := httputil.DumpResponse(resp, true)
@@ -183,6 +185,7 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		}
 		log.Printf("\n%s\n", string(dump))
 	}
+	log.Printf("\n13\n")
 	return resp, err
 }
 
