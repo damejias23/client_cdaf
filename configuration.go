@@ -106,7 +106,7 @@ func NewConfiguration() *Configuration {
 	cfg := &Configuration{
 		DefaultHeader:    make(map[string]string),
 		UserAgent:        "OpenAPI-Generator/1.0.0/go",
-		Debug:            true, // set to true, default: false
+		Debug:            false, // set to true, default: false
 		Servers:          ServerConfigurations{
 			{
 				URL: os.Getenv("CDAF_IP_ADDR") + os.Getenv("CDAF_SUBSCR_ROUTE"),
