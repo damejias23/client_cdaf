@@ -17,7 +17,7 @@ import (
 
 // CdafEvent Describes an event to be subscribed
 type CdafEvent struct {
-	Type CdafEventType `json:"type"`
+	Type CdafEventTypeAnyOf `json:"type"`
 	MaxReports *int32 `json:"maxReports,omitempty"`
 	// indicating a time in seconds.
 	MaxResponseTime *int32 `json:"maxResponseTime,omitempty"`
@@ -33,7 +33,7 @@ type CdafEvent struct {
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewCdafEvent(type_ CdafEventType) *CdafEvent {
+func NewCdafEvent(type_ CdafEventTypeAnyOf) *CdafEvent {
 	this := CdafEvent{}
 	this.Type = type_
 	return &this
@@ -48,9 +48,9 @@ func NewCdafEventWithDefaults() *CdafEvent {
 }
 
 // GetType returns the Type field value
-func (o *CdafEvent) GetType() CdafEventType {
+func (o *CdafEvent) GetType() CdafEventTypeAnyOf {
 	if o == nil {
-		var ret CdafEventType
+		var ret CdafEventTypeAnyOf
 		return ret
 	}
 
@@ -59,7 +59,7 @@ func (o *CdafEvent) GetType() CdafEventType {
 
 // GetTypeOk returns a tuple with the Type field value
 // and a boolean to check if the value has been set.
-func (o *CdafEvent) GetTypeOk() (*CdafEventType, bool) {
+func (o *CdafEvent) GetTypeOk() (*CdafEventTypeAnyOf, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -67,7 +67,7 @@ func (o *CdafEvent) GetTypeOk() (*CdafEventType, bool) {
 }
 
 // SetType sets field value
-func (o *CdafEvent) SetType(v CdafEventType) {
+func (o *CdafEvent) SetType(v CdafEventTypeAnyOf) {
 	o.Type = v
 }
 
