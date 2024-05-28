@@ -122,20 +122,20 @@ func NewConfiguration() *Configuration {
 		OperationServers: map[string]ServerConfigurations{},
 	}
 	// Check if AMF_HTTP_VERSION is set to "2"
-	// if os.Getenv("CDAF_HTTP_VERSION") == "2" {
-	// 	// Set HTTPClient configuration for AMF HTTP version 2
-	// 	cfg.HTTPClient = &http.Client{
-	// 		Transport: &http2.Transport{
-	// 			AllowHTTP: true,
-	// 			DialTLS: func(netw, addr string, cfg *tls.Config) (net.Conn, error) {
-	// 				return net.Dial(netw, addr)
-	// 			},
-	// 		},
-	// 	}
-	// } else {
+	if os.Getenv("CDAF_HTTP_VERSION") == "2" {
+		// Set HTTPClient configuration for AMF HTTP version 2
+		cfg.HTTPClient = &http.Client{
+			Transport: &http2.Transport{
+				AllowHTTP: true,
+				DialTLS: func(netw, addr string, cfg *tls.Config) (net.Conn, error) {
+					return net.Dial(netw, addr)
+				},
+			},
+		}
+	} else {
 		// Set default HTTPClient configuration for other cases
 		cfg.HTTPClient = &http.Client{}
-	// }
+	}
 	return cfg
 }
 
