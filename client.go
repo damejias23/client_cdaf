@@ -171,7 +171,7 @@ func (c *APIClient) callAPI(request *http.Request) (*http.Response, error) {
 		}
 		log.Printf("\n%s\n", string(dump))
 	}
-	log.Printf("\n11\n")
+	log.Printf("\n11 request: %s \n", request)
 	resp, err := c.cfg.HTTPClient.Do(request)
 	if err != nil {
 		log.Printf("\n Response %s \n err: %v \n", resp, err)
