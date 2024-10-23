@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **NfCpuUsage** | Pointer to **int32** |  | [optional] 
 **NfMemoryUsage** | Pointer to **int32** |  | [optional] 
 **NfStorageUsage** | Pointer to **int32** |  | [optional] 
+**NfStatus** | Pointer to [**NfStatus**](NfStatus.md) |  | [optional] 
 
 ## Methods
 
@@ -179,6 +180,31 @@ SetNfStorageUsage sets NfStorageUsage field to given value.
 `func (o *NfLoadLevelInformation) HasNfStorageUsage() bool`
 
 HasNfStorageUsage returns a boolean if a field has been set.
+
+### GetNfStatus
+
+`func (o *NfLoadLevelInformation) GetNfStatus() NfStatus`
+
+GetNfStatus returns the NfStatus field if non-nil, zero value otherwise.
+
+### GetNfStatusOk
+
+`func (o *NfLoadLevelInformation) GetNfStatusOk() (*NfStatus, bool)`
+
+GetNfStatusOk returns a tuple with the NfStatus field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetNfStatus
+
+`func (o *NfLoadLevelInformation) SetNfStatus(v NfStatus)`
+
+SetNfStatus sets NfStatus field to given value.
+
+### HasNfStatus
+
+`func (o *NfLoadLevelInformation) HasNfStatus() bool`
+
+HasNfStatus returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
