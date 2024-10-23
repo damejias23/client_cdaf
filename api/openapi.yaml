@@ -507,13 +507,6 @@ components:
       - PERIODIC
       type: string
     NfStatus:
-      anyOf:
-      - required:
-        - statusRegistered
-      - required:
-        - statusUnregistered
-      - required:
-        - statusUndiscoverable
       properties:
         statusRegistered:
           maximum: 100
